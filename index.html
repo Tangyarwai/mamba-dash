@@ -1,0 +1,84 @@
+<!doctype html><html lang="zh"><head><meta name="robots" content="noindex"><style>#lock{position:fixed;inset:0;z-index:9999;background:#140809;display:flex;align-items:center;justify-content:center;font-family:Menlo,Consolas,monospace;color:#e9d9cf}#lock form{display:flex;flex-direction:column;gap:12px;width:280px}#lock input,#lock button{padding:12px;border-radius:10px;border:1px solid #5a2a2a;background:#2a1214;color:#e9d9cf;font:inherit}#lock button{background:#ff4d6d;color:#140809;font-weight:700;cursor:pointer}#lerr{color:#ff4d6d;min-height:1em;font-size:12px}</style>
+<script>(function(){const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));let PW=null,DATA=null,last=0,ready,res;ready=new Promise(r=>res=r);
+async function load(pw){const e=await (await fetch('data.enc?'+Date.now(),{cache:'no-store'})).json();const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(e.salt),iterations:e.it||200000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(e.iv)},k,b64(e.ct))))}
+const F=window.fetch.bind(window);window.fetch=async function(u,o){const m=String(u).match(/^\/api\/(state|desk)/);if(!m)return F(u,o);await ready;
+if(Date.now()-last>120000){last=Date.now();try{DATA=await load(PW)}catch(e){}}return new Response(JSON.stringify(DATA[m[1]]),{headers:{'content-type':'application/json'}})};
+async function tryPw(pw){try{DATA=await load(pw);PW=pw;last=Date.now();return true}catch(e){return false}}
+document.addEventListener('DOMContentLoaded',async()=>{const L=document.createElement('div');L.id='lock';L.innerHTML='<form><div style="font-size:20px;font-weight:700">MAMBA · TRADING MODE</div><input id="lpw" type="password" placeholder="密码 / password" autofocus><label style="font-size:12px"><input type="checkbox" id="lrem" checked> 记住此设备</label><button>解锁</button><div id="lerr"></div></form>';document.body.appendChild(L);
+const sv=localStorage.getItem('mdpw');if(sv&&await tryPw(sv)){L.remove();res();return}
+L.querySelector('form').onsubmit=async ev=>{ev.preventDefault();const pw=document.getElementById('lpw').value.trim();document.getElementById('lerr').textContent='解密中…';
+if(await tryPw(pw)){if(document.getElementById('lrem').checked)localStorage.setItem('mdpw',pw);L.remove();res()}else document.getElementById('lerr').textContent='密码错误'}})})();</script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mamba · Trading Mode</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#2a1214,#140809 60%,#0c0506);color:#e9d9cf;font-family:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;min-height:100vh}
+.w{max-width:1000px;margin:0 auto;padding:22px}
+.hd{display:flex;align-items:center;gap:14px}.logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(145deg,#d9d2cc,#6d6460);display:flex;align-items:center;justify-content:center;font-size:28px}
+.ttl b{font-size:30px;color:#d8cfc8;font-family:-apple-system,sans-serif}.ttl div{font-size:10px;letter-spacing:2px;color:#8a7570}
+.sp{flex:1}.muted{color:#8a7570;font-size:10px;letter-spacing:1px}.pill{border:1px solid #4a2a28;border-radius:18px;padding:7px 12px;font-size:11px;color:#e3b08a;background:#1f0d0e}
+.seg{display:inline-block;width:6px;height:10px;margin-left:2px;background:#4a2a28;border-radius:1px}.seg.on{background:#e3a07a}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ccfb5;margin-right:6px;animation:p 1.4s infinite}@keyframes p{50%{opacity:.3}}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.c{background:rgba(40,16,18,.75);border:1px solid #3a1e1e;border-radius:10px;padding:14px}
+.lb{font-size:9px;letter-spacing:1.5px;color:#9b827b;text-transform:uppercase}.big{font-size:22px;margin:6px 0 4px}.sm{font-size:10px;color:#8a7570}
+.pos{color:#4fd8c0}.neg{color:#ef6f6f}.or{color:#f0a070}
+.tp{border-left:3px solid #4fd8c0}
+.banner{margin:16px -22px;padding:22px 36px;background:linear-gradient(90deg,#2b1013,#3a1718,#2b1013);border-top:2px solid #e07a7a;border-bottom:2px solid #e07a7a;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden}
+.banner:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 6px,rgba(255,255,255,.025) 6px 7px)}
+.banner.flash{animation:fl 1s 3}@keyframes fl{50%{box-shadow:0 0 40px #4fd8c0 inset;border-color:#4fd8c0}}
+.banner .k{color:#f0a070;font-weight:700;font-size:13px;font-family:-apple-system,sans-serif}.banner .tk{font-size:24px;margin:10px 0}.banner .amt{flex:1;text-align:center;font-size:52px;font-weight:800;color:#4fd8c0;font-family:-apple-system,sans-serif}.banner .pc{font-size:30px;font-weight:800;color:#f5b28a;font-family:-apple-system,sans-serif}
+.g2{display:grid;grid-template-columns:1.25fr 1fr;gap:12px}
+.log{font-size:10px;line-height:1.75;height:240px;overflow:hidden}.log .t{color:#6e5a55}
+.FILL{color:#e0a080}.EXEC{color:#79a6ff}.WHALE{color:#c58cff}.SCAN{color:#9b9b9b}.WARN{color:#ef6f6f}
+.tl{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:10px;color:#8a7570}.bar{flex:1;height:6px;background:#2e1818;border-radius:3px;position:relative}
+.bar .f{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#2f8f80,#9a7a66);border-radius:3px}.bar .m{position:absolute;top:-3px;width:10px;height:10px;transform:translateX(-5px) rotate(45deg);background:#c87850}.bar .m.L{background:#7a3c3c}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}.ag{background:rgba(40,16,18,.75);border:1px solid #3a1e1e;border-radius:10px;padding:12px 10px;text-align:center;position:relative}
+.ag .rk{position:absolute;right:8px;top:6px;font-size:9px;color:#8a7570}.ag .tag{position:absolute;left:8px;top:8px;width:18px;height:3px;border-radius:2px}
+.av{width:38px;height:34px;border-radius:12px;margin:8px auto 6px}.ag .n{font-size:11px}.ag .v{font-size:10px;margin-top:3px}.ag .ln{height:3px;border-radius:2px;margin-top:8px}
+h4{margin:0 0 10px;font-size:10px;letter-spacing:2px;color:#9b827b;font-weight:400}
+</style></head><body><div class="w">
+<div class="hd"><div class="logo">🐍</div><div class="ttl"><b>Mamba</b><div>TRADING MODE</div></div><div class="sp"></div>
+<span class="muted" id="tasks">— TASKS</span><span class="pill" id="combo">COMBO x0</span><span class="pill"><span class="dot" id="ld"></span><span id="live">LIVE</span></span></div>
+<div class="g">
+<div class="c"><div class="lb">Balance</div><div class="big" id="bal">—</div><div class="sm" id="bals">started at 0.505 SOL</div></div>
+<div class="c tp"><div class="lb">Total PnL</div><div class="big" id="pnl">—</div><div class="sm" id="pnlp"></div></div>
+<div class="c" style="display:flex;gap:14px;align-items:center"><div style="font-size:30px">🏆</div><div><div class="lb">Largest Win</div><div class="big or" id="lw">—</div><div class="sm" id="lws"></div></div></div>
+<div class="c" style="display:flex;gap:14px;align-items:center"><svg width="56" height="56" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="none" stroke="#3a1e1e" stroke-width="4"/><circle id="dn" cx="18" cy="18" r="15" fill="none" stroke="#3ccfb5" stroke-width="4" stroke-dasharray="0 100" pathLength="100" transform="rotate(-90 18 18)"/><text id="dt" x="18" y="21" text-anchor="middle" font-size="8" fill="#e9d9cf">—</text></svg><div><div class="lb">Win Rate</div><div class="sm pos" id="w">—</div><div class="sm or" id="l">—</div></div></div>
+</div>
+<div class="banner" id="bn"><div><div class="k">BIG CLOSE</div><div class="tk" id="bt">—</div><div class="sm" id="bm"></div></div><div class="amt" id="ba">—</div><div class="pc" id="bp"></div></div>
+<div class="g2"><div class="c"><h4>EQUITY · SOL</h4><svg id="eq" width="100%" height="240" viewBox="0 0 520 240" preserveAspectRatio="none"></svg></div>
+<div class="c"><h4>EVENT LOG</h4><div class="log" id="log"></div></div></div>
+<div class="tl"><span>SESSION 24H</span><div class="bar" id="tl"></div><span id="now"></span></div>
+<div class="row" id="ags"></div>
+<div class="c" style="margin-top:12px"><h4>DAWN CLUSTER COPY · <span id="dwh"></span></h4><div class="sm" id="dws"></div><div class="log" id="dwl" style="max-height:220px"></div></div>
+</div>
+<script>
+const $=i=>document.getElementById(i),f=(x,d=4)=>(x>=0?'+':'')+(+x).toFixed(d),esc=s=>String(s).replace(/[<&>]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const COL=['#3aa596','#b07850','#9a7ad8','#d09060','#4c8fd8','#d06a6a','#7ab060'];let lastClose=null;
+function kind(e){if(e.src==='trade')return e.kind==='WARN'?'WARN':'FILL';if(e.src==='copy')return 'WHALE';if(e.kind==='WARN')return 'WARN';if(/BUY|SELL/.test(e.kind))return 'EXEC';return 'SCAN'}
+async function go(){try{const[s,d]=await Promise.all([fetch('/api/state').then(r=>r.json()),fetch('/api/desk').then(r=>r.json())]);
+const usd=s.solUsd;$('bal').textContent=s.equity.toFixed(4)+' SOL';$('bals').textContent=`≈ $${s.equityUsd.toFixed(2)} · started at ${s.start} SOL · goal ${s.goal} SOL (${(s.equity/s.goal*100).toFixed(1)}%)`;
+$('pnl').textContent=f(s.pnl)+' SOL';$('pnl').className='big '+(s.pnl>=0?'pos':'neg');$('pnlp').textContent=f(s.pnlPct,2)+'% · ≈ $'+(s.pnl*usd).toFixed(2);
+const cl=d.closedList||[];const W=cl.filter(c=>c.pnl>0),L=cl.length-W.length;const best=[...W].sort((a,b)=>b.pnl-a.pnl)[0];
+if(best){$('lw').textContent=f(best.pnl)+' SOL';$('lws').textContent=`$${best.sym} · +${(best.pnl/best.inSol*100).toFixed(1)}% · tier ${best.strat}`}
+const wr=cl.length?W.length/cl.length*100:0;$('dn').setAttribute('stroke-dasharray',wr+' 100');$('dt').textContent=Math.round(wr)+'%';$('w').textContent=W.length+'W';$('l').textContent=L+'L';
+let combo=0;for(let i=cl.length-1;i>=0&&cl[i].pnl>0;i--)combo++;$('combo').innerHTML='COMBO x'+combo+' '+[0,1,2,3,4].map(i=>`<span class="seg ${i<combo?'on':''}"></span>`).join('');
+$('tasks').textContent=(s.trades.length+(d.feed||[]).length).toLocaleString()+' TASKS';
+const ok=s.monitor.running;$('ld').style.background=ok?'#3ccfb5':'#ef6f6f';$('live').textContent=ok?'LIVE':'MONITOR DOWN';
+const lc=[...W].sort((a,b)=>b.t-a.t)[0];if(lc){$('bt').textContent='$'+lc.sym;$('ba').textContent=f(lc.pnl)+' SOL';$('bp').textContent='+'+(lc.pnl/lc.inSol*100).toFixed(1)+'%';
+$('bm').textContent=`COMBO x${combo} · ${lc.leaders?lc.leaders[0].slice(0,6):'TIER '+lc.strat} · ${new Date(lc.t).toLocaleString('zh-CN',{hour12:false})}`;if(lastClose&&lastClose!==lc.t){$('bn').classList.remove('flash');void $('bn').offsetWidth;$('bn').classList.add('flash')}lastClose=lc.t}
+const e=s.equityCurve.filter(x=>x.equity<s.start*1.6).slice(-200);if(e.length>1){const v=e.map(x=>x.equity),mn=Math.min(...v,s.start)*0.995,mx=Math.max(...v)*1.005,X=i=>i/(e.length-1)*510+5,Y=y=>230-(y-mn)/(mx-mn)*215;
+let p=`M${X(0)},${Y(v[0])}`,dots='';for(let i=1;i<e.length;i++){p+=`H${X(i)}V${Y(v[i])}`;if(Math.abs(v[i]-v[i-1])>0.003)dots+=`<circle cx="${X(i)}" cy="${Y(v[i])}" r="3.5" fill="#c87850"/>`}
+$('eq').innerHTML=`<line x1="0" x2="520" y1="${Y(s.start)}" y2="${Y(s.start)}" stroke="#5a3030" stroke-dasharray="4 4"/><path d="${p}" fill="none" stroke="#3aa596" stroke-width="1.6"/>${dots}<text x="6" y="${Y(s.start)-4}" fill="#8a7570" font-size="9">${s.start}</text><text x="6" y="12" fill="#8a7570" font-size="9">${mx.toFixed(3)}</text>`}
+$('log').innerHTML=(d.feed||[]).slice(-22).reverse().map(x=>{const k=kind(x);return `<div><span class="t">${new Date(x.t).toLocaleTimeString('zh-CN',{hour12:false})}</span> <span class="${k}">[${k}]</span> ${esc(x.msg.slice(0,70))}</div>`}).join('');
+const now=Date.now(),t0=now-864e5;const day=cl.filter(c=>c.t>t0);const pct=Math.max(0,Math.min(100,(new Date().getHours()*60+new Date().getMinutes())/14.4));
+$('tl').innerHTML=`<div class="f" style="width:100%"></div>`+day.map(c=>`<div class="m ${c.pnl>0?'':'L'}" style="left:${(c.t-t0)/864e5*100}%" title="${esc(c.sym)} ${f(c.pnl)}"></div>`).join('');$('now').textContent=new Date().toLocaleTimeString('zh-CN',{hour12:false,hour:'2-digit',minute:'2-digit'});
+const ags=[];for(const w of d.wallets||[]){const m=cl.filter(c=>(c.leaders||[]).includes(w.address));ags.push({n:w.address.slice(0,6),sub:'COPY'+(w.active?'':' · OFF'),pnl:m.reduce((a,c)=>a+c.pnl,0),cnt:m.length})}
+const tn={A:'TIER A',B:'TIER B',C:'TIER C',F:'TIER F 早期',P:'TIER P 回调',E:'TIER E 新盘'};for(const[k,v]of Object.entries(d.byStrat||{}))if(k!=='K')ags.push({n:tn[k]||(k==='?'?'未标注':'TIER '+k),sub:v.w+'W/'+(v.n-v.w)+'L',pnl:v.net,cnt:v.n});
+ags.sort((a,b)=>b.pnl-a.pnl);$('ags').innerHTML=ags.map((a,i)=>{const c=COL[i%COL.length];return `<div class="ag" style="${i===0?'border-color:#7a5a90':''}"><span class="tag" style="background:${c}"></span><span class="rk">${i===0?'👑 ':''}#${i+1}</span><div class="av" style="background:${c}"></div><div class="n">${esc(a.n)}</div><div class="sm">${a.sub} · ${a.cnt}笔</div><div class="v ${a.pnl>=0?'pos':'neg'}">${f(a.pnl)} SOL</div><div class="ln" style="background:${c}"></div></div>`}).join('')
+}catch(e){$('live').textContent='ERR '+e.message}}
+go();setInterval(go,15000);
+</script><script>async function dawn(){try{const d=(await fetch('/api/desk').then(r=>r.json())).dawn;if(!d)return;document.getElementById('dwh').textContent=(d.live?'LIVE':'PAPER')+' · '+d.mode+' · '+d.min+'+ traders / '+d.win+'m';
+document.getElementById('dws').textContent='open '+d.open.map(o=>o.sym).join(', ')+' ('+d.open.length+') · closed '+d.closed+' · paper PnL '+d.pnl.toFixed(4)+' SOL · benched '+(d.bench.join(',')||'none');
+const col={BUY:'#3ccfb5',SELL:'#ff9a3c',CLOSE:'#ffd34d',SKIP:'#8a6f66',SWAP_TRADER:'#ff4d6d'};document.getElementById('dwl').innerHTML=d.signals.map(s=>`<div style="color:${col[s.type]||'#e9d9cf'}">${new Date(s.ts).toTimeString().slice(0,8)} ${s.type} ${s.symbol||''} ${(s.leaders||[]).join('+')} ${s.msg||''}</div>`).join('')||'<div class="sm">waiting for leader trades…</div>'}catch(e){}}dawn();setInterval(dawn,15000)</script>
+</body></html>
