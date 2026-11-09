@@ -1,0 +1,130 @@
+<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex"><meta name="theme-color" content="#0b0d10"><title>Mamba Live · 纸面模拟</title>
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<style>
+:root{--bg:#0b0d10;--card:#14171c;--line:#23272e;--txt:#e9edf2;--mut:#7d8590;--g:#3ee07a;--r:#ff5a6a;--b:#5ab4ff;--p:#a78bfa;--o:#ffad33;--pk:#ff5fa8;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif}
+body{max-width:480px;margin:0 auto;padding:10px 12px 40px;overflow-x:hidden}
+.mono{font-family:var(--mono)}.g{color:var(--g)}.r{color:var(--r)}.m{color:var(--mut)}
+#lock{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:50}
+#lock form{width:84%;max-width:340px;text-align:center}#lock input{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:17px;margin:14px 0}
+#lock button{width:100%;padding:13px;border-radius:12px;border:0;background:var(--g);color:#05210f;font-weight:700;font-size:16px}
+header{display:flex;align-items:center;gap:10px;padding:4px 0 10px}.logo{width:40px;height:40px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center}
+.logo i{width:6px;height:13px;background:#111;border-radius:3px;margin:0 3px;transform:skewX(-12deg)}
+h1{font-size:21px;font-weight:700}.pill{font-size:11px;padding:3px 8px;border-radius:8px;background:#22262d;color:#aab}
+.paper{background:#3a2a00;color:#ffcf4d;border:1px solid #6b4f00;font-weight:700}.live{margin-left:auto;font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:20px;display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g);animation:bl 1.6s infinite}.stale .dot{background:var(--o);box-shadow:0 0 8px var(--o)}
+@keyframes bl{50%{opacity:.35}}
+.tick{overflow:hidden;white-space:nowrap;margin:0 -12px 8px;mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.tick .in{display:inline-flex;gap:8px;animation:mq 40s linear infinite;padding-left:8px}@keyframes mq{to{transform:translateX(-50%)}}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:18px;padding:5px 11px 5px 5px;font:13px var(--mono);background:#101317}
+.av{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 10px var(--mono);color:#111;flex:none}
+.sub{font:12px var(--mono);color:var(--mut);margin-bottom:2px}
+.big{display:flex;align-items:flex-end;justify-content:space-between}.eq{font:800 54px/1.05 -apple-system,"Helvetica Neue",sans-serif;letter-spacing:-2px}.eq .c{color:#6b7078}
+.dlt{font:600 14px var(--mono);padding:5px 10px;border-radius:9px;background:#12331f;color:var(--g);margin-bottom:10px}.dlt.neg{background:#3a1419;color:var(--r)}
+.row2{display:flex;gap:8px;align-items:center;margin:6px 0}.in110{font:13px var(--mono);background:#1b1f25;padding:5px 11px;border-radius:9px}.mult{font:700 14px var(--mono);background:#fff;color:#000;padding:5px 11px;border-radius:9px}
+.wl{display:flex;justify-content:space-between;font:13px var(--mono);margin:2px 0 6px}
+.ring{position:relative;width:46px;height:46px}.ring svg{transform:rotate(-90deg)}.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 11px var(--mono)}
+#curve{width:100%;height:150px;display:block}.cl{display:flex;justify-content:space-between;font:11px var(--mono);color:var(--mut);margin:2px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.ct{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15px;margin-bottom:6px}.ct small{font:12px var(--mono);color:var(--g);font-weight:400}
+.feed{max-height:118px;overflow:hidden}.fr{display:flex;gap:7px;align-items:center;font:12.5px var(--mono);padding:3px 0;white-space:nowrap;overflow:hidden;animation:fi .5s}
+.fr .t{color:var(--mut)}.fr .s{font-weight:700;width:34px}.fr .why{color:var(--mut);overflow:hidden;text-overflow:ellipsis}@keyframes fi{from{opacity:0;transform:translateY(-8px)}}
+.ag{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid #1d2127;font:12.5px var(--mono)}.ag:first-of-type{border-top:0}
+.ag .n{width:64px;font-weight:700;flex:none}.ag .l{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ag .tg{font-size:10.5px;color:var(--mut);background:#1c2026;padding:2px 7px;border-radius:6px;flex:none}
+.ag.flash .l{animation:fl 1.2s}@keyframes fl{0%{color:#fff;text-shadow:0 0 8px currentColor}}
+.bot{width:24px;height:20px;flex:none}
+#graph{width:100%;display:block}
+.toast{position:fixed;left:50%;top:10px;transform:translate(-50%,-140%);width:min(94vw,450px);background:rgba(36,39,45,.96);backdrop-filter:blur(10px);border-radius:16px;padding:11px 13px;display:flex;gap:10px;align-items:center;z-index:40;transition:transform .45s cubic-bezier(.2,1.3,.4,1);box-shadow:0 8px 30px #0008}
+.toast.on{transform:translate(-50%,0)}.toast .ic{font-size:26px}.toast b{display:block;font-size:14.5px}.toast span{font-size:12px;color:#aab}
+.rc .rk{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.rc .rk div{background:#1b1f25;border-radius:9px;padding:6px;font:11px var(--mono);color:var(--mut)}.rc .rk b{display:block;color:var(--txt);font-size:17px}
+.rc .lbl{font:12px var(--mono);color:var(--mut)}.rc .v{font:800 30px -apple-system,sans-serif}
+.op{font:12px var(--mono);display:flex;justify-content:space-between;padding:3px 0}
+.foot{font:11px var(--mono);color:var(--mut);text-align:center;line-height:1.6;margin-top:8px}
+.streak{font:12px var(--mono);padding:3px 8px;border-radius:8px;background:#1b1f25}
+</style></head><body>
+<div id="lock"><form onsubmit="unlock(event)"><div class="logo" style="margin:0 auto"><i></i><i></i></div><h1 style="margin-top:10px">Mamba Live</h1><div class="m" style="font-size:13px;margin-top:4px">纸面模拟交易大屏 · 输入密码</div>
+<input id="pw" type="password" autocomplete="current-password" placeholder="密码"><button>解锁</button><div id="perr" class="r" style="margin-top:10px;font-size:13px"></div></form></div>
+<div id="toast" class="toast"><div class="ic" id="tic">🐸</div><div style="flex:1;min-width:0"><b id="tt"></b><span id="ts"></span></div></div>
+<header><div class="logo"><i></i><i></i></div><h1>Mamba</h1><span class="pill paper">纸面模拟 PAPER</span><div class="live" id="livep"><span class="dot"></span><span id="livet">Live</span></div></header>
+<div class="tick"><div class="in" id="tick"></div></div>
+<div class="sub" id="sub">—</div>
+<div class="big"><div class="eq" id="eq">$—</div><div class="dlt" id="dlt">—</div></div>
+<div class="row2"><span class="in110" id="inx">—</span><span class="mult" id="mult">—</span><span style="flex:1"></span><span class="streak" id="streak"></span>
+<div class="ring"><svg width="46" height="46"><circle cx="23" cy="23" r="19" stroke="#23272e" stroke-width="5" fill="none"/><circle id="ringc" cx="23" cy="23" r="19" stroke="#3ee07a" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="119.4" style="transition:stroke-dashoffset 1s"/></svg><b id="wr">—</b></div></div>
+<div class="wl"><span id="wl">—</span><span class="m" id="clock"></span></div>
+<canvas id="curve"></canvas><div class="cl"><span id="c0"></span><span>— 净值 &nbsp; -- 本金</span><span id="c1"></span></div>
+<div class="card"><div class="ct">成交流水 <small class="m" id="fcount"></small></div><div class="feed" id="feed"></div></div>
+<div class="card" id="opc" style="display:none"><div class="ct">持仓 <small id="opn"></small></div><div id="ops"></div></div>
+<div class="card"><div class="ct">agents · 协同工作 <small>● <span id="nrun">5</span> running</small></div><div id="agents"></div></div>
+<div class="card"><div class="ct">5 agents → mamba core <small id="sig">0 signals</small></div><svg id="graph" viewBox="0 0 360 230"></svg></div>
+<div class="card rc"><div class="ct">今日复盘 <small class="m" id="rday"></small></div>
+<div style="display:flex;justify-content:space-between;align-items:flex-end"><div><div class="lbl">今日起始</div><div class="v" id="rs">—</div></div><div style="text-align:right"><div class="lbl">当前</div><div class="v" id="rn">—</div></div></div>
+<div class="rk"><div><b id="rt">—</b>平仓笔数</div><div><b id="rcn">—</b>币种</div><div><b id="rw">—</b>胜/负</div><div><b id="rsg">—</b>信号</div></div>
+<div class="op"><span>最佳</span><span id="rb">—</span></div><div class="op"><span>最差</span><span id="rwr">—</span></div></div>
+<div class="foot" id="foot">纸面模拟 PAPER · 不动真钱 · 不签名不发交易<br>行情: DexScreener / RugCheck / Jupiter 报价（只读）</div>
+<script>
+const RAW='https://raw.githubusercontent.com/Tangyarwai/mamba-dash/live-data/';const SLOT=30;
+const AG=[['smarts','SMART$','#3ee07a','copy-wallets'],['trends','TRENDS','#5ab4ff','dexscreener'],['debate','DEBATE','#a78bfa','bull/bear'],['router','ROUTER','#ffad33','jupiter'],['exec','EXEC','#ff5fa8','paper']];
+let KEY=null,pass=null,D=null,skew=0,lastSlot=0,shownEv=new Set(),lastSig=0,dispEq=null,first=true;
+const $=id=>document.getElementById(id);const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function dec(o){const salt=b64(o.salt),iv=b64(o.iv),ct=b64(o.ct);const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+ const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:o.it||250000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+ return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv},k,ct)))}
+async function grab(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw r.status;return r.json()}
+async function load(){const nowS=Math.floor((Date.now()+skew)/1000);let top=Math.floor((nowS-15)/SLOT)-1;
+ for(let s=top;s>top-12&&s>lastSlot;s--){try{const o=await grab(RAW+'d/'+s+'.enc');const d=await dec(o);lastSlot=s;return d}catch(e){if(e instanceof DOMException||e?.name==='OperationError')throw e}}
+ if(!D){try{return await dec(await grab(RAW+'latest.enc'))}catch(e){if(e?.name==='OperationError')throw e}return await dec(await grab('data.enc?'+Date.now()))}return null}
+async function unlock(e){e.preventDefault();pass=$('pw').value;$('perr').textContent='解密中…';
+ try{const d=await load();if(!d)throw 0;localStorage.setItem('mlp',pass);$('lock').style.display='none';apply(d);setInterval(poll,15000)}catch(err){$('perr').textContent=err?.name==='OperationError'?'密码不对':'加载失败，稍后重试';}}
+async function poll(){try{const d=await load();if(d)apply(d)}catch(e){}stale()}
+function stale(){if(!D)return;const age=(Date.now()+skew-D.ts)/1000;$('livep').classList.toggle('stale',age>150);$('livet').textContent=age>150?'延迟 '+Math.round(age/60)+'m':'Live'}
+const money=x=>'$'+x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const sg=x=>(x>=0?'+':'-')+'$'+Math.abs(x).toFixed(2);const hm=t=>new Date(t).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false});
+const pal=['#3ee07a','#5ab4ff','#ffad33','#ff5fa8','#a78bfa','#f5d547','#58e0d0','#ff7a45'];const col=s=>pal[[...s].reduce((a,c)=>a+c.charCodeAt(0),0)%pal.length];
+const av=s=>`<span class="av" style="background:${col(s)}">${(s||'?').replace(/^\$/,'')[0]?.toUpperCase()||'?'}</span>`;const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function apply(d){if(D&&d.ts<=D.ts)return;if(d.ts>Date.now()+skew)skew=d.ts-Date.now()+5000;const prev=D;D=d;stale();
+ // ticker
+ const tk=(d.ticker||[]).map(t=>`<span class="chip">${av(t.sym)}$${esc(t.sym)} <span class="${t.h1>=0?'g':'r'}">${t.h1>=0?'+':''}${t.h1.toFixed(1)}%</span> <span class="m">${t.src}</span></span>`).join('');$('tick').innerHTML=tk?tk+tk:'<span class="chip m">扫描中…</span>';
+ const hrs=(d.ts-d.startTs)/36e5;$('sub').textContent=`纸面撮合 · 实时行情 · 5 agents · 运行 ${Math.floor(hrs)}h ${Math.round(hrs%1*60)}m`;
+ tween(d.equity);const dd=d.pnl;$('dlt').textContent=sg(dd);$('dlt').classList.toggle('neg',dd<0);
+ $('inx').textContent=`本金 $${d.startCash} · ${d.trades} 笔`;$('mult').textContent=d.mult.toFixed(2)+'×';
+ $('wl').innerHTML=`<span class="${dd>=0?'g':'r'}">${sg(dd)}</span> · ${d.wins}W ${d.losses}L`;$('clock').textContent=hm(d.ts);
+ const wr=d.winRate;$('wr').textContent=wr==null?'—':Math.round(wr*100)+'%';$('ringc').style.strokeDashoffset=119.4*(1-(wr||0));$('ringc').style.stroke=wr!=null&&wr<.5?'#ff5a6a':'#3ee07a';
+ $('streak').textContent=d.streak?.n?`${d.streak.win?'🔥 连胜':'❄️ 连败'} ${d.streak.n}`:'连胜 0';
+ // feed
+ $('feed').innerHTML=(d.feed||[]).slice(0,6).map(f=>`<div class="fr"><span class="t">${hm(f.ts)}</span><span class="s ${f.side==='BUY'?'':'g'}" style="${f.side==='BUY'?'color:var(--b)':''}">${f.side}</span>${av(f.sym)}<span>$${esc(f.sym)}</span><span class="why">· ${esc(f.why)} · ${f.side==='SELL'?`<span class="${f.pnl>=0?'g':'r'}">${sg(f.pnl)}</span>`:'$'+f.usd.toFixed(2)}</span></div>`).join('')||'<div class="fr m">还没有成交 · 硬筛+辩论通过才会下单</div>';
+ $('fcount').textContent=`买 ${d.stats.buys} · 卖 ${d.stats.sells}`;
+ $('opc').style.display=d.open.length?'':'none';$('opn').textContent=d.open.length+'/'+d.cfg.maxOpen;$('ops').innerHTML=d.open.map(o=>`<div class="op"><span>${av(o.sym)} $${esc(o.sym)} <span class="m">${esc(o.why)}</span></span><span class="${o.pct>=0?'g':'r'}">${(o.pct*100).toFixed(1)}% · $${o.val.toFixed(2)}</span></div>`).join('');
+ // agents
+ $('agents').innerHTML=AG.map(([k,n,c,tg])=>{const a=d.agents[k]||{line:'待命'};const fresh=prev&&prev.agents[k]&&a.ts!==prev.agents[k].ts;return `<div class="ag ${fresh?'flash':''}">${bot(c)}<span class="n" style="color:${c}">${n}</span><span class="l">${esc(a.line)}</span><span class="tg">${tg}</span></div>`}).join('');
+ $('sig').textContent=d.signals.toLocaleString()+' signals';
+ // pulses for agents that fired since last poll
+ const fired=AG.filter(([k])=>{const a=d.agents[k];return a&&(!prev||!prev.agents[k]||a.ts!==prev.agents[k].ts)&&!a.idle}).map(x=>x[0]);if(fired.length)pulse(fired,!!(prev&&d.stats.buys+d.stats.sells>prev.stats.buys+prev.stats.sells));
+ drawCurve();recap(d);
+ // toasts
+ const evs=(d.events||[]).filter(e=>!shownEv.has(e.id));evs.forEach(e=>shownEv.add(e.id));if(!first){evs.filter(e=>Date.now()+skew-e.ts<10*60e3).reverse().forEach((e,i)=>setTimeout(()=>toast(e),i*4200))}first=false}
+function bot(c){return `<svg class="bot" viewBox="0 0 24 20"><rect x="3" y="5" width="18" height="13" rx="5" fill="${c}"/><rect x="11" y="0" width="2" height="5" fill="${c}"/><circle cx="12" cy="1.5" r="1.5" fill="${c}"/><rect x="8" y="9" width="2.4" height="5" rx="1.2" fill="#111"/><rect x="13.6" y="9" width="2.4" height="5" rx="1.2" fill="#111"/></svg>`}
+let tw=null;function tween(to){const from=dispEq??to;const t0=performance.now();cancelAnimationFrame(tw);const st=t=>{const k=Math.min(1,(t-t0)/1200);const v=from+(to-from)*(1-Math.pow(1-k,3));dispEq=v;const s=money(v);const i=s.indexOf('.');$('eq').innerHTML=s.slice(0,i)+'<span class="c">'+s.slice(i)+'</span>';if(k<1)tw=requestAnimationFrame(st)};tw=requestAnimationFrame(st)}
+let tq=[],tb=false;function toast(e){const ic={smart:'🐸',win:'💰',loss:'🛑',buy:'⚡'}[e.type]||'🔔';$('tic').textContent=ic;$('tt').textContent=e.title;$('ts').textContent=(e.sub||'')+' · 纸面';$('toast').classList.add('on');if(navigator.vibrate&&e.type==='win')navigator.vibrate(60);setTimeout(()=>$('toast').classList.remove('on'),3600)}
+function drawCurve(){const cv=$('curve'),dpr=devicePixelRatio||1,W=cv.clientWidth,H=150;cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.scale(dpr,dpr);
+ const pts=(D.equityCurve||[]);if(pts.length<1)return;const t0=pts[0][0],t1=Math.max(D.ts,t0+60e3);let lo=Math.min(D.startCash,...pts.map(p=>p[1])),hi=Math.max(D.startCash,...pts.map(p=>p[1]));const pad=Math.max((hi-lo)*.15,D.startCash*.004);lo-=pad;hi+=pad;
+ const X=t=>8+(W-16)*(t-t0)/(t1-t0),Y=v=>H-6-(H-12)*(v-lo)/(hi-lo);x.setLineDash([4,4]);x.strokeStyle='#4a5059';x.beginPath();x.moveTo(0,Y(D.startCash));x.lineTo(W,Y(D.startCash));x.stroke();x.setLineDash([]);
+ const up=D.equity>=D.startCash,c=up?'#3ee07a':'#ff5a6a';const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,up?'#3ee07a55':'#ff5a6a55');g.addColorStop(1,'#0000');
+ x.beginPath();pts.forEach((p,i)=>i?x.lineTo(X(p[0]),Y(p[1])):x.moveTo(X(p[0]),Y(p[1])));x.lineTo(X(D.ts),Y(D.equity));const ex=X(D.ts),ey=Y(D.equity);x.strokeStyle=c;x.lineWidth=2.2;x.stroke();x.lineTo(ex,H);x.lineTo(X(t0),H);x.fillStyle=g;x.fill();
+ x.beginPath();x.arc(ex,ey,6,0,7);x.fillStyle='#000';x.fill();x.lineWidth=2.5;x.strokeStyle='#fff';x.stroke();$('c0').textContent=hm(t0);$('c1').textContent=hm(D.ts)}
+function recap(d){const r=d.recap;$('rday').textContent=r.day;$('rs').textContent=money(r.startEq);$('rn').textContent=money(r.nowEq);$('rn').className='v '+(r.nowEq>=r.startEq?'g':'r');$('rt').textContent=r.trades;$('rcn').textContent=r.coins;$('rw').textContent=r.wins+'/'+r.losses;$('rsg').textContent=d.signals;
+ $('rb').innerHTML=r.best?`$${esc(r.best.sym)} <span class="${r.best.pnl>=0?'g':'r'}">${sg(r.best.pnl)}</span>`:'—';$('rwr').innerHTML=r.worst?`$${esc(r.worst.sym)} <span class="${r.worst.pnl>=0?'g':'r'}">${sg(r.worst.pnl)}</span>`:'—';
+ $('foot').innerHTML=`纸面模拟 PAPER · 不动真钱 · 不签名不发交易<br>模拟成本 ${(d.cfg.cost*100).toFixed(0)}%/边 · 止损 ${(d.cfg.stop*100).toFixed(0)}% · 扫描 ${d.stats.scanned.toLocaleString()} · 拒绝 ${d.stats.rejected.toLocaleString()}<br>数据更新 ${new Date(d.ts).toLocaleString('zh-CN',{hour12:false})}`}
+// node graph
+const NX=[40,110,180,250,320],CY=180;function graph(){let s='';AG.forEach(([k,n,c],i)=>{s+=`<path id="p${i}" d="M${NX[i]} 48 C ${NX[i]} 120, 180 ${i==2?120:110}, 180 ${CY-28}" stroke="${c}" stroke-opacity=".35" stroke-width="1.6" fill="none"/>`});
+ AG.forEach(([k,n,c],i)=>{s+=`<text x="${NX[i]}" y="11" fill="${c}" font-size="9" text-anchor="middle" font-family="monospace">${n}</text><g transform="translate(${NX[i]-13},16)"><rect x="2" y="7" width="22" height="17" rx="6" fill="${c}"/><rect x="12" y="1" width="2" height="6" fill="${c}"/><rect x="8" y="12" width="3" height="7" rx="1.5" fill="#111"/><rect x="15" y="12" width="3" height="7" rx="1.5" fill="#111"/></g>`});
+ s+=`<path id="pe" d="M208 ${CY} L 252 ${CY}" stroke="#3ee07a" stroke-opacity=".4" stroke-width="1.6" stroke-dasharray="3 3"/><circle id="core" cx="180" cy="${CY}" r="27" fill="#0d1a12" stroke="#3ee07a" stroke-width="2.5"/><rect x="166" y="${CY-14}" width="28" height="28" rx="8" fill="#fff"/><rect x="173" y="${CY-7}" width="4" height="12" rx="2" fill="#111"/><rect x="183" y="${CY-7}" width="4" height="12" rx="2" fill="#111"/>
+ <text x="180" y="${CY+44}" fill="#e9edf2" font-size="10" font-weight="700" text-anchor="middle">MAMBA CORE</text><text x="128" y="${CY+4}" fill="#7d8590" font-size="9" text-anchor="middle" font-family="monospace">5 → 1</text><text x="258" y="${CY+4}" fill="#3ee07a" font-size="10" font-family="monospace" id="extx">⚡ EXECUTE</text><g id="dots"></g>`;$('graph').innerHTML=s}
+function pulse(keys,exec){const g=$('dots');keys.forEach((k,j)=>{const i=AG.findIndex(a=>a[0]===k);const p=$('p'+i);p.setAttribute('stroke-opacity','1');setTimeout(()=>p.setAttribute('stroke-opacity','.35'),1600);
+ const L=p.getTotalLength();const d=document.createElementNS('http://www.w3.org/2000/svg','circle');d.setAttribute('r','3.5');d.setAttribute('fill',AG[i][2]);g.appendChild(d);const t0=performance.now()+j*180;
+ const st=t=>{const k2=(t-t0)/1300;if(k2<0)return requestAnimationFrame(st);if(k2>1){d.remove();core(exec);return}const q=p.getPointAtLength(L*k2);d.setAttribute('cx',q.x);d.setAttribute('cy',q.y);requestAnimationFrame(st)};requestAnimationFrame(st)})}
+function core(exec){const c=$('core');c.setAttribute('stroke-width','5');c.style.filter='drop-shadow(0 0 8px #3ee07a)';setTimeout(()=>{c.setAttribute('stroke-width','2.5');c.style.filter=''},500);if(exec){const e=$('pe');e.setAttribute('stroke-opacity','1');$('extx').setAttribute('fill','#fff');setTimeout(()=>{e.setAttribute('stroke-opacity','.4');$('extx').setAttribute('fill','#3ee07a')},1500)}}
+graph();setInterval(stale,5000);addEventListener('resize',()=>D&&drawCurve());
+const sp=localStorage.getItem('mlp');if(sp){$('pw').value=sp;unlock(new Event('submit'))}
+</script></body></html>
