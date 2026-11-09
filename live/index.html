@@ -31,7 +31,7 @@ h1{font-size:21px;font-weight:700}.pill{font-size:11px;padding:3px 8px;border-ra
 .feed{max-height:118px;overflow:hidden}.fr{display:flex;gap:7px;align-items:center;font:12.5px var(--mono);padding:3px 0;white-space:nowrap;overflow:hidden;animation:fi .5s}
 .fr .t{color:var(--mut)}.fr .s{font-weight:700;width:34px}.fr .why{color:var(--mut);overflow:hidden;text-overflow:ellipsis}@keyframes fi{from{opacity:0;transform:translateY(-8px)}}
 .ag{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid #1d2127;font:12.5px var(--mono)}.ag:first-of-type{border-top:0}
-.ag .n{width:64px;font-weight:700;flex:none}.ag .l{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ag .tg{font-size:10.5px;color:var(--mut);background:#1c2026;padding:2px 7px;border-radius:6px;flex:none}
+.ag .n{width:58px;font-weight:700;flex:none}.ag .l{flex:1;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35;word-break:break-all}.ag .tg{font-size:10.5px;color:var(--mut);background:#1c2026;padding:2px 7px;border-radius:6px;flex:none}
 .ag.flash .l{animation:fl 1.2s}@keyframes fl{0%{color:#fff;text-shadow:0 0 8px currentColor}}
 .bot{width:24px;height:20px;flex:none}
 #graph{width:100%;display:block}
@@ -72,7 +72,7 @@ async function dec(o){const salt=b64(o.salt),iv=b64(o.iv),ct=b64(o.ct);const km=
  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:o.it||250000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv},k,ct)))}
 async function grab(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw r.status;return r.json()}
-async function load(){const nowS=Math.floor((Date.now()+skew)/1000);let top=Math.floor((nowS-15)/SLOT);
+async function load(){const nowS=Math.floor((Date.now()+skew)/1000);let top=Math.floor((nowS-20)/SLOT);
  for(let s=top;s>top-12&&s>lastSlot;s--){try{const o=await grab(RAW+'d/'+s+'.enc');const d=await dec(o);lastSlot=s;return d}catch(e){if(e instanceof DOMException||e?.name==='OperationError')throw e}}
  if(!D){try{return await dec(await grab(RAW+'latest.enc'))}catch(e){if(e?.name==='OperationError')throw e}return await dec(await grab('data.enc?'+Date.now()))}return null}
 async function unlock(e){e.preventDefault();pass=$('pw').value;$('perr').textContent='解密中…';
@@ -109,7 +109,7 @@ let tw=null;function tween(to){const from=dispEq??to;const t0=performance.now();
 let tq=[],tb=false;function toast(e){const ic={smart:'🐸',win:'💰',loss:'🛑',buy:'⚡'}[e.type]||'🔔';$('tic').textContent=ic;$('tt').textContent=e.title;$('ts').textContent=(e.sub||'')+' · 纸面';$('toast').classList.add('on');if(navigator.vibrate&&e.type==='win')navigator.vibrate(60);setTimeout(()=>$('toast').classList.remove('on'),3600)}
 function drawCurve(){const cv=$('curve'),dpr=devicePixelRatio||1,W=cv.clientWidth,H=150;cv.width=W*dpr;cv.height=H*dpr;const x=cv.getContext('2d');x.scale(dpr,dpr);
  const pts=(D.equityCurve||[]);if(pts.length<1)return;const t0=pts[0][0],t1=Math.max(D.ts,t0+60e3);let lo=Math.min(D.startCash,...pts.map(p=>p[1])),hi=Math.max(D.startCash,...pts.map(p=>p[1]));const pad=Math.max((hi-lo)*.15,D.startCash*.004);lo-=pad;hi+=pad;
- const X=t=>8+(W-16)*(t-t0)/(t1-t0),Y=v=>H-6-(H-12)*(v-lo)/(hi-lo);x.setLineDash([4,4]);x.strokeStyle='#4a5059';x.beginPath();x.moveTo(0,Y(D.startCash));x.lineTo(W,Y(D.startCash));x.stroke();x.setLineDash([]);
+ const X=t=>8+(W-16)*(t-t0)/(t1-t0),Y=v=>H-6-(H-12)*(v-lo)/(hi-lo);x.setLineDash([4,4]);x.strokeStyle='#8b93a0';x.lineWidth=1;x.beginPath();x.moveTo(0,Y(D.startCash));x.lineTo(W,Y(D.startCash));x.stroke();x.setLineDash([]);
  const up=D.equity>=D.startCash,c=up?'#3ee07a':'#ff5a6a';const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,up?'#3ee07a55':'#ff5a6a55');g.addColorStop(1,'#0000');
  x.beginPath();pts.forEach((p,i)=>i?x.lineTo(X(p[0]),Y(p[1])):x.moveTo(X(p[0]),Y(p[1])));x.lineTo(X(D.ts),Y(D.equity));const ex=X(D.ts),ey=Y(D.equity);x.strokeStyle=c;x.lineWidth=2.2;x.stroke();x.lineTo(ex,H);x.lineTo(X(t0),H);x.fillStyle=g;x.fill();
  x.beginPath();x.arc(ex,ey,6,0,7);x.fillStyle='#000';x.fill();x.lineWidth=2.5;x.strokeStyle='#fff';x.stroke();$('c0').textContent=hm(t0);$('c1').textContent=hm(D.ts)}
