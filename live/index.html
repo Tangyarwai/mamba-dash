@@ -72,7 +72,7 @@ async function dec(o){const salt=b64(o.salt),iv=b64(o.iv),ct=b64(o.ct);const km=
  const k=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:o.it||250000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv},k,ct)))}
 async function grab(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw r.status;return r.json()}
-async function load(){const nowS=Math.floor((Date.now()+skew)/1000);let top=Math.floor((nowS-15)/SLOT)-1;
+async function load(){const nowS=Math.floor((Date.now()+skew)/1000);let top=Math.floor((nowS-15)/SLOT);
  for(let s=top;s>top-12&&s>lastSlot;s--){try{const o=await grab(RAW+'d/'+s+'.enc');const d=await dec(o);lastSlot=s;return d}catch(e){if(e instanceof DOMException||e?.name==='OperationError')throw e}}
  if(!D){try{return await dec(await grab(RAW+'latest.enc'))}catch(e){if(e?.name==='OperationError')throw e}return await dec(await grab('data.enc?'+Date.now()))}return null}
 async function unlock(e){e.preventDefault();pass=$('pw').value;$('perr').textContent='解密中…';
